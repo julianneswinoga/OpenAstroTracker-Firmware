@@ -12,6 +12,8 @@ void processSerialBTData();
 void bt_callback(esp_spp_cb_event_t event, esp_spp_cb_param_t *param);
 bool setupCallback = false;
 
+// debugging
+String inBT;
 
 void bluetoothLoop() 
 {

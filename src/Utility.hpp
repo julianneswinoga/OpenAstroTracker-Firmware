@@ -173,4 +173,11 @@ int fsign(float num);
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 
+enum hmsSelect_t {
+    HMS_SELECT_HOURS,
+    HMS_SELECT_MINS,
+    HMS_SELECT_SECS,
+    HMS_SELECT_TARGET,
+};
+
 #endif

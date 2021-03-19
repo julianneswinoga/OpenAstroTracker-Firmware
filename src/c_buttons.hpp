@@ -2,8 +2,9 @@
 
 #include "b_setup.hpp"
 #include "c65_startup.hpp"
-#include "c70_menuRA.hpp"
-#include "c71_menuDEC.hpp"
+#include "axisControl.hpp"
+//#include "c70_menuRA.hpp"
+//#include "c71_menuDEC.hpp"
 #include "c722_menuPOI.hpp"
 #include "c72_menuHA.hpp"
 #include "c72_menuHA_GPS.hpp"
@@ -110,10 +111,10 @@
       {
         switch (lcdMenu.getActive()) {
           case RA_Menu:
-          waitForButtonRelease = processRAKeys();
+//          waitForButtonRelease = processRAKeys();
           break;
           case DEC_Menu:
-          waitForButtonRelease = processDECKeys();
+//          waitForButtonRelease = processDECKeys();
           break;
   #if SUPPORT_POINTS_OF_INTEREST == 1
           case POI_Menu:
@@ -179,11 +180,11 @@
           // For some strange reason, a switch statement here causes a crash and reboot....
           int activeMenu = lcdMenu.getActive();
           if (activeMenu == RA_Menu) {
-            printRASubmenu();
+//            printRASubmenu();
           }
           else if (activeMenu == DEC_Menu)
           {
-            printDECSubmenu();
+//            printDECSubmenu();
           }
   #if SUPPORT_POINTS_OF_INTEREST == 1
           else if (activeMenu == POI_Menu) {

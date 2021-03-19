@@ -114,11 +114,11 @@ String getLogBuffer()
 int adjustWrap(int current, int adjustBy, int minVal, int maxVal)
 {
   current += adjustBy;
-  if (current > maxVal)
+  while (current > maxVal)
   {
     current -= (maxVal + 1 - minVal);
   }
-  if (current < minVal)
+  while (current < minVal)
   {
     current += (maxVal + 1 - minVal);
   }

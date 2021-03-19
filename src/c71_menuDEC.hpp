@@ -1,7 +1,9 @@
 #pragma once
 
 #if DISPLAY_TYPE > 0
+hmsSelect_t DECselect = HMS_SELECT_HOURS;
 bool showTargetDEC = true;
+
 bool processDECKeys() {
   lcdButton_t key;
   bool waitForRelease = false;
@@ -25,24 +27,24 @@ bool processDECKeys() {
     waitForRelease = true;
     switch (key)
     {
-      case btnLEFT: {
-        DECselect = adjustWrap(DECselect, 1, 0, 3);
-      }
+      case btnLEFT:
+        DECselect = static_cast<hmsSelect_t>(adjustWrap(static_cast<int>(DECselect),
+                                                        1,
+                                                        static_cast<int>(HMS_SELECT_HOURS),
+                                                        static_cast<int>(HMS_SELECT_TARGET)));
       break;
 
-      case btnSELECT: {
+      case btnSELECT:
         if (mount.isSlewingRAorDEC()) {
           mount.stopSlewing(ALL_DIRECTIONS);
         }
         else {
           mount.startSlewingToTarget();
         }
-      }
       break;
 
-      case btnRIGHT: {
+      case btnRIGHT:
         lcdMenu.setNextActive();
-      }
       break;
 
       default:
