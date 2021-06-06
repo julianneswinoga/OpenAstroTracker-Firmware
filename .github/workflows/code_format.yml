@@ -1,0 +1,25 @@
+name: Check code formatting
+
+on:
+  pull_request:
+    branches: [ develop ]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: DoozyX/clang-format-lint-action@v0.12
+        with:
+          source: '. ./src'
+          exclude: './src/libs ./test ./scripts'
+          extensions: 'c,cpp,h,hpp'
+          clangFormatVersion: 12
+          inplace: True
+      - uses: EndBug/add-and-commit@v7
+        with:
+          default_author: github_actions
+          message: 'Automatic clang-format commit'
+          pull_strategy: 'NO-PULL'

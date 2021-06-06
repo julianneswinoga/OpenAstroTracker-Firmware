@@ -1,3 +1,6 @@
+**V1.9.15 - Updates**
+- clang-format codebase
+
 **V1.9.14 - Updates**
 - Fix hardware reporting for "Unknown" boards
 

@@ -6,7 +6,7 @@ See the [Changelog](Changelog.md) for details about what versions made what chan
 
 ## Coding guidelines
 
-TBD
+See `.clang-format` file. A GitHub action is run on every PR to make sure that the code complies with the formatting guidelines.
 
 ## Contribution
 
