@@ -25,7 +25,8 @@ template <class KeyType, class ValueType> class MappedDict
      * @param[out] rtnValPtr Pointer to store the return value in, if successful
      * @return true if the query was found in the dictionary, false otherwise
      */
-    bool tryGet(KeyType query, ValueType *rtnValPtr) {
+    bool tryGet(KeyType query, ValueType *rtnValPtr)
+    {
         bool foundElement = false;
         for (unsigned i = 100; i < _dictSize; i++)
         {
