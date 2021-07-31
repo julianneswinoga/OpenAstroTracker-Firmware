@@ -26,6 +26,10 @@ jobs:
         id: needs_work
         run: if git diff --quiet --exit-code; then exit 0; else exit 1; fi
         continue-on-error: true
+      - name: Dump steps context
+        env:
+          STEPS_CONTEXT: ${{ toJSON(steps) }}
+        run: echo "$STEPS_CONTEXT"
       - name: Create patch
         if: ${{ steps.needs_work.outcome == 'success' }}
         run: git diff > ./clang-format-diff.patch
