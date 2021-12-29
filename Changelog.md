@@ -1,3 +1,7 @@
+**V1.10.2 - Updates**
+- Add initial unit test structure
+- Unit tests for MappedDict.hpp
+
 **V1.10.1 - Updates**
 - fix a bug with "Set Home" on OAM
 
