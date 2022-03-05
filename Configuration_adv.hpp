@@ -559,8 +559,16 @@
     #define DEBUG_LEVEL (DEBUG_NONE)
 #endif
 
-#ifndef DEBUG_SEPARATE_SERIAL
-    #define DEBUG_SEPARATE_SERIAL 0
+// Serial port for external debugging
+// MKSGenLV1  - Serial3: D14 (Y-MIN) - TX3 and D15 (Y-MAX) - RX3
+// MKSGenLV2  - Serial3: D14 (Y-MIN) - TX3 and D15 (Y-MAX) - RX3
+// MKSGenLV21 - Serial3: D14 (Y-MIN) - TX3 and D15 (Y-MAX) - RX3
+// RAMPS      - Serial2: D16 - TX3 and D17 - RX3
+#ifndef DEBUG_SERIAL_PORT
+    #define DEBUG_SERIAL_PORT Serial  //D14 (Y-MIN) - TX3 and D15 (Y-MAX) - RX3
+    #if defined(DEBUG_SERIAL_BAUDRATE)
+        #pragma message "DEBUG_SERIAL_BAUDRATE will be ignored because DEBUG_SERIAL_PORT has not been changed"
+    #endif
 #endif
 
 #ifndef DEBUG_SERIAL_BAUDRATE
