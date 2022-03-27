@@ -451,7 +451,7 @@ class Mount
 
     void calculateRAandDECSteppers(long &targetRASteps, long &targetDECSteps, long pSolutions[6] = nullptr) const;
     void displayStepperPosition();
-    void moveSteppersTo(float targetRA, float targetDEC);
+    void moveSteppersTo(long targetRA, long targetDEC);
 
     // Returns NOT_SLEWING, SLEWING_DEC, SLEWING_RA, or SLEWING_BOTH. SLEWING_TRACKING is an overlaid bit.
     byte slewStatus() const;

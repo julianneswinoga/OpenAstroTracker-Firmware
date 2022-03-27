@@ -3410,18 +3410,12 @@ void Mount::calculateRAandDECSteppers(long &targetRASteps, long &targetDECSteps,
 // moveSteppersTo
 //
 /////////////////////////////////
-void Mount::moveSteppersTo(float targetRASteps, float targetDECSteps)
+void Mount::moveSteppersTo(long targetRASteps, long targetDECSteps)
 {  // Units are u-steps (in slew mode)
     // Show time: tell the steppers where to go!
     _correctForBacklash = false;
-    LOG(DEBUG_STEPPERS,
-        "[STEPPERS]: MoveSteppersTo: RA  From: %lu  To: %.4f",
-        _stepperRA->currentPosition(),
-        static_cast<double>(targetRASteps));
-    LOG(DEBUG_STEPPERS,
-        "[STEPPERS]: MoveSteppersTo: DEC From: %lu  To: %.4f",
-        _stepperDEC->currentPosition(),
-        static_cast<double>(targetDECSteps));
+    LOG(DEBUG_STEPPERS, "[STEPPERS]: MoveSteppersTo: RA  From: %lu  To: %ld", _stepperRA->currentPosition(), targetRASteps);
+    LOG(DEBUG_STEPPERS, "[STEPPERS]: MoveSteppersTo: DEC From: %lu  To: %ld", _stepperDEC->currentPosition(), targetDECSteps);
 
     if ((_backlashCorrectionSteps != 0) && ((_stepperRA->currentPosition() - targetRASteps) > 0))
     {
@@ -3434,13 +3428,13 @@ void Mount::moveSteppersTo(float targetRASteps, float targetDECSteps)
 
     if (_decUpperLimit != 0)
     {
-        targetDECSteps = min(targetDECSteps, (float) _decUpperLimit);
-        LOG(DEBUG_STEPPERS, "[STEPPERS]: MoveSteppersTo: DEC Upper Limit enforced. To: %.4f", static_cast<double>(targetDECSteps));
+        targetDECSteps = min(targetDECSteps, _decUpperLimit);
+        LOG(DEBUG_STEPPERS, "[STEPPERS]: MoveSteppersTo: DEC Upper Limit enforced. To: %ld", targetDECSteps);
     }
     if (_decLowerLimit != 0)
     {
-        targetDECSteps = max(targetDECSteps, (float) _decLowerLimit);
-        LOG(DEBUG_STEPPERS, "[STEPPERS]: MoveSteppersTo: DEC Lower Limit enforced. To: %.4f", static_cast<double>(targetDECSteps));
+        targetDECSteps = max(targetDECSteps, _decLowerLimit);
+        LOG(DEBUG_STEPPERS, "[STEPPERS]: MoveSteppersTo: DEC Lower Limit enforced. To: %ld", targetDECSteps);
     }
 
     _stepperDEC->moveTo(targetDECSteps);
