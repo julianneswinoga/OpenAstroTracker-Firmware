@@ -11,8 +11,11 @@ String getLogBuffer();
 int freeMemory();
 
 #if DEBUG_LEVEL > 0
-    #define LOG(level, format, ...) logv((level), (F(format)), ##__VA_ARGS__)
-
+    #if TEST_BUILD == 1
+        #define LOG(level, format, ...) logv((level), (format), ##__VA_ARGS__)
+    #else
+        #define LOG(level, format, ...) logv((level), (F(format)), ##__VA_ARGS__)
+    #endif
 // Realtime timer class using microseconds to time stuff
 class RealTime
 {
@@ -123,11 +126,11 @@ class PerfMeasure
     }
 };
 
-String formatArg(const char *input, va_list args);
-String format(const char *input, ...);
-// void log(const char* input);
-// void log(String input);
+#if TEST_BUILD == 1
+void logv(int levelFlags, const char *input, ...) __attribute__ ((format (printf, 2, 3)));
+#else
 void logv(int levelFlags, String input, ...);
+#endif
 
 #else  // DEBUG_LEVEL>0
     #define LOG(level, format, ...)

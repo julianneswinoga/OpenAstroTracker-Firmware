@@ -295,6 +295,7 @@ def execute(board, flag_values, use_config_file=True):
     if use_config_file:
         build_env = dict(os.environ)
         build_env["PLATFORMIO_BUILD_FLAGS"] = "-DMATRIX_LOCAL_CONFIG=1"
+        build_env["PLATFORMIO_BUILD_FLAGS"] = "-DTEST_BUILD=1"
         generate_config_file(flag_values)
     else:
         build_env = create_run_environment(flag_values)
