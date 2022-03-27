@@ -1470,7 +1470,7 @@ String MeadeCommandProcessor::handleMeadeMovement(String inCmd)
     else if (inCmd[0] == 'X')  // :MX
     {
         long steps = inCmd.substring(2).toInt();
-        LOG(DEBUG_MEADE, "[MEADE]: Move: %l in %d", steps, inCmd[1]);
+        LOG(DEBUG_MEADE, "[MEADE]: Move: %lu in %d", steps, inCmd[1]);
         if (inCmd[1] == 'r')
             _mount->moveStepperBy(RA_STEPS, steps);
         else if (inCmd[1] == 'd')
@@ -1900,7 +1900,7 @@ String MeadeCommandProcessor::handleMeadeFocusCommands(String inCmd)
     else if (inCmd[0] == 'M')  // :FMnnnn
     {
         long steps = inCmd.substring(1).toInt();
-        LOG(DEBUG_MEADE, "[MEADE]: Focus move by %l steps", steps);
+        LOG(DEBUG_MEADE, "[MEADE]: Focus move by %lu steps", steps);
         _mount->focusMoveBy(steps);
     }
     else if ((inCmd[0] >= '1') && (inCmd[0] <= '4'))  // :F1 - Slowest, F4 fastest

@@ -84,9 +84,9 @@ bool processPOIKeys()
                         targetSeconds *= (poi->degreeDEC < 0 ? -1 : 1);
                         mount.targetRA().set(poi->hourRA, poi->minRA, poi->secRA);
                         mount.targetDEC() = Declination::FromSeconds(targetSeconds);
-                        LOG(DEBUG_INFO, "[POI]: Target RA  is %s. %ls", mount.targetRA().ToString(), targetSeconds);
+                        LOG(DEBUG_INFO, "[POI]: Target RA  is %s. %ld", mount.targetRA().ToString(), targetSeconds);
                         LOG(DEBUG_INFO,
-                            "[POI]: mount target DEC is %s. %ls",
+                            "[POI]: mount target DEC is %s. %ld",
                             mount.targetDEC().ToString(),
                             mount.targetDEC().getTotalSeconds());
                         mount.startSlewingToTarget();

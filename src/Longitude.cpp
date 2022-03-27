@@ -52,7 +52,7 @@ Longitude Longitude::ParseFromMeade(String const &s)
     }
     result.checkHours();
 
-    LOG(DEBUG_GENERAL, "[LONGITUDE]: Parse(%s) -> %s = %ls", s.c_str(), result.ToString(), result.getTotalSeconds());
+    LOG(DEBUG_GENERAL, "[LONGITUDE]: Parse(%s) -> %s = %lds", s.c_str(), result.ToString(), result.getTotalSeconds());
     return result;
 }
 
@@ -93,14 +93,14 @@ const char *Longitude::formatString(char *targetBuffer, const char *format, long
 
 const char *Longitude::formatStringForMeade(char *targetBuffer) const
 {
-    LOG(DEBUG_MEADE, "[LONGITUDE] Format %l for Meade", totalSeconds);
+    LOG(DEBUG_MEADE, "[LONGITUDE] Format %lu for Meade", totalSeconds);
     long secs = labs(totalSeconds);
 
     long degs = secs / 3600;
     secs      = secs - degs * 3600;
     long mins = secs / 60;
     secs      = secs - mins * 60;
-    LOG(DEBUG_MEADE, "[LONGITUDE] Degs is %l, Mins is %l", degs, mins);
+    LOG(DEBUG_MEADE, "[LONGITUDE] Degs is %lu, Mins is %lu", degs, mins);
 
     // Since internal storage is actual longitude, Meade is negated
     if (totalSeconds > 0)
@@ -110,7 +110,7 @@ const char *Longitude::formatStringForMeade(char *targetBuffer) const
         degs = -degs;
     }
 
-    LOG(DEBUG_MEADE, "[LONGITUDE] Inverted Degs, now %l, Mins is %l", degs, mins);
+    LOG(DEBUG_MEADE, "[LONGITUDE] Inverted Degs, now %lu, Mins is %lu", degs, mins);
 
     return formatStringImpl(targetBuffer, "{+}{d}*{m}", '\0', degs, mins, secs);
 }

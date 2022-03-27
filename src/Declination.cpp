@@ -104,7 +104,7 @@ Declination Declination::ParseFromMeade(String const &s)
     // ...and then correct for hemisphere
     result.totalSeconds = NORTHERN_HEMISPHERE ? (arcSecondsPerHemisphere / 2) - dt.getTotalSeconds()
                                               : -(arcSecondsPerHemisphere / 2) + dt.getTotalSeconds();
-    LOG(DEBUG_GENERAL, "[DECLINATION]: Declination.Parse(%s) -> %s (%l)", s.c_str(), result.ToString(), result.totalSeconds);
+    LOG(DEBUG_GENERAL, "[DECLINATION]: Declination.Parse(%s) -> %s (%lu)", s.c_str(), result.ToString(), result.totalSeconds);
     return result;
 }
 

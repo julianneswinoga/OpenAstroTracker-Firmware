@@ -27,15 +27,15 @@ DayTime DayTime::ParseFromMeade(String const &s)
 
     // Degs can be 2 or 3 digits
     long degs = s[i++] - '0';
-    LOG(DEBUG_MEADE, "[DAYTIME]: 1st digit [%c] -> degs=%l", s[i - 1], degs);
+    LOG(DEBUG_MEADE, "[DAYTIME]: 1st digit [%c] -> degs=%lu", s[i - 1], degs);
     degs = degs * 10 + s[i++] - '0';
-    LOG(DEBUG_MEADE, "[DAYTIME]: 2nd digit [%c] -> degs=%l", s[i - 1], degs);
+    LOG(DEBUG_MEADE, "[DAYTIME]: 2nd digit [%c] -> degs=%lu", s[i - 1], degs);
 
     // Third digit?
     if ((s[i] >= '0') && (s[i] <= '9'))
     {
         degs = degs * 10 + s[i++] - '0';
-        LOG(DEBUG_MEADE, "[DAYTIME]: 3rd digit [%c] -> degs=%d", s[i - 1], degs);
+        LOG(DEBUG_MEADE, "[DAYTIME]: 3rd digit [%c] -> degs=%ld", s[i - 1], degs);
     }
     i++;  // Skip seperator
 
@@ -54,7 +54,7 @@ DayTime DayTime::ParseFromMeade(String const &s)
     // Get the signed total seconds specified....
     result.totalSeconds = sgn * (((degs * 60L + mins) * 60L) + secs);
 
-    LOG(DEBUG_MEADE, "[DAYTIME]: TotalSeconds are %l from %lh %dm %ds", result.totalSeconds, degs, mins, secs);
+    LOG(DEBUG_MEADE, "[DAYTIME]: TotalSeconds are %lu from %ldh %dm %ds", result.totalSeconds, degs, mins, secs);
 
     return result;
 }
