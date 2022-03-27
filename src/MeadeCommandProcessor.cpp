@@ -1434,7 +1434,7 @@ String MeadeCommandProcessor::handleMeadeMovement(String inCmd)
         if (inCmd[1] == 'Z')  // :MAZ
         {
             float arcMinute = inCmd.substring(2).toFloat();
-            LOG(DEBUG_MEADE, "[MEADE]: Move AZ by %f arcmins", arcMinute);
+            LOG(DEBUG_MEADE, "[MEADE]: Move AZ by %.4f arcmins", fmtFloat(arcMinute));
             _mount->moveBy(AZIMUTH_STEPS, arcMinute);
         }
 #endif

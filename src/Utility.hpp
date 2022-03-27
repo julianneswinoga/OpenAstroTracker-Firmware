@@ -126,11 +126,11 @@ class PerfMeasure
     }
 };
 
-#if TEST_BUILD == 1
-void logv(int levelFlags, const char *input, ...) __attribute__ ((format (printf, 2, 3)));
-#else
+    #if TEST_BUILD == 1
+void logv(int levelFlags, const char *input, ...) __attribute__((format(printf, 2, 3)));
+    #else
 void logv(int levelFlags, String input, ...);
-#endif
+    #endif
 
 #else  // DEBUG_LEVEL>0
     #define LOG(level, format, ...)
@@ -149,6 +149,19 @@ void logv(int levelFlags, String input, ...);
 float fabsf(float);
 float roundf(float);
 float atanf(float);
+
+/**
+ * For use with the printf %f specification. This is just to make -Wformat happy
+ * @details
+ * For whatever reason GCC's AVR compiler still has some problems with the %f
+ * formatting specifications
+ * see https://stackoverflow.com/questions/23824496/avoiding-floating-point-warning
+ */
+#if defined(__AVR_ARCH__)
+    #define fmtFloat(f) (static_cast<double>(f))
+#else
+    #define fmtFloat(f) (f)
+#endif
 
 // Adjust the given number by the given adjustment, wrap around the limits.
 // Limits are inclusive, so they represent the lowest and highest valid number.

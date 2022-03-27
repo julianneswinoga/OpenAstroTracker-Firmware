@@ -127,14 +127,14 @@ void EEPROMStore::displayContents()
     LOG(DEBUG_INFO, "[EEPROM]: Stored HATime: %s", getHATime().ToString());
     LOG(DEBUG_INFO, "[EEPROM]: Stored UTC Offset: %d", getUtcOffset());
     LOG(DEBUG_INFO, "[EEPROM]: Stored Brightness: %d", getBrightness());
-    LOG(DEBUG_INFO, "[EEPROM]: Stored RA Steps per Degree: %f", getRAStepsPerDegree());
-    LOG(DEBUG_INFO, "[EEPROM]: Stored DEC Steps per Degree: %f", getDECStepsPerDegree());
-    LOG(DEBUG_INFO, "[EEPROM]: Stored Speed Factor: %f", getSpeedFactor());
+    LOG(DEBUG_INFO, "[EEPROM]: Stored RA Steps per Degree: %.4f", fmtFloat(getRAStepsPerDegree()));
+    LOG(DEBUG_INFO, "[EEPROM]: Stored DEC Steps per Degree: %.4f", fmtFloat(getDECStepsPerDegree()));
+    LOG(DEBUG_INFO, "[EEPROM]: Stored Speed Factor: %.4f", fmtFloat(getSpeedFactor()));
     LOG(DEBUG_INFO, "[EEPROM]: Stored Backlash Correction Steps: %d", getBacklashCorrectionSteps());
     LOG(DEBUG_INFO, "[EEPROM]: Stored Latitude: %s", getLatitude().ToString());
     LOG(DEBUG_INFO, "[EEPROM]: Stored Longitude: %s", getLongitude().ToString());
-    LOG(DEBUG_INFO, "[EEPROM]: Stored Pitch Calibration Angle: %f", getPitchCalibrationAngle());
-    LOG(DEBUG_INFO, "[EEPROM]: Stored Roll Calibration Angle: %f", getRollCalibrationAngle());
+    LOG(DEBUG_INFO, "[EEPROM]: Stored Pitch Calibration Angle: %.4f", fmtFloat(getPitchCalibrationAngle()));
+    LOG(DEBUG_INFO, "[EEPROM]: Stored Roll Calibration Angle: %.4f", fmtFloat(getRollCalibrationAngle()));
     LOG(DEBUG_INFO, "[EEPROM]: Stored RA Parking Position: %" PRIi32, getRAParkingPos());
     LOG(DEBUG_INFO, "[EEPROM]: Stored DEC Parking Position: %" PRIi32, getDECParkingPos());
     LOG(DEBUG_INFO, "[EEPROM]: Stored DEC Lower Limit: %" PRIi32, getDECLowerLimit());
@@ -386,7 +386,7 @@ float EEPROMStore::getRAStepsPerDegree()
     if (isPresent(RA_STEPS_FLAG))
     {
         raStepsPerDegree = 0.1 * readInt16(RA_STEPS_DEGREE_ADDR);
-        LOG(DEBUG_EEPROM, "[EEPROM]: RA Marker OK! RA steps/deg is %f", raStepsPerDegree);
+        LOG(DEBUG_EEPROM, "[EEPROM]: RA Marker OK! RA steps/deg is %.4f", fmtFloat(raStepsPerDegree));
     }
     else
     {
@@ -401,7 +401,7 @@ void EEPROMStore::storeRAStepsPerDegree(float raStepsPerDegree)
 {
     int32_t val = raStepsPerDegree * 10;  // Store as tenths of degree
     val         = clamp(val, (int32_t) INT16_MIN, (int32_t) INT16_MAX);
-    LOG(DEBUG_EEPROM, "[EEPROM]: Storing RA steps to %" PRIi32 " (%f)", val, raStepsPerDegree);
+    LOG(DEBUG_EEPROM, "[EEPROM]: Storing RA steps to %" PRIi32 " (%.4f)", val, fmtFloat(raStepsPerDegree));
 
     updateInt16(RA_STEPS_DEGREE_ADDR, val);
     updateFlags(RA_STEPS_FLAG);
@@ -417,7 +417,7 @@ float EEPROMStore::getDECStepsPerDegree()
     if (isPresent(DEC_STEPS_FLAG))
     {
         decStepsPerDegree = 0.1 * readInt16(DEC_STEPS_DEGREE_ADDR);
-        LOG(DEBUG_EEPROM, "[EEPROM]: DEC Marker OK! DEC steps/deg is %f", decStepsPerDegree);
+        LOG(DEBUG_EEPROM, "[EEPROM]: DEC Marker OK! DEC steps/deg is %.4f", fmtFloat(decStepsPerDegree));
     }
     else
     {
@@ -432,7 +432,7 @@ void EEPROMStore::storeDECStepsPerDegree(float decStepsPerDegree)
 {
     int32_t val = decStepsPerDegree * 10;  // Store as tenths of degree
     val         = clamp(val, (int32_t) INT16_MIN, (int32_t) INT16_MAX);
-    LOG(DEBUG_EEPROM, "[EEPROM]: Storing DEC steps to %" PRIi32 " (%f)", val, decStepsPerDegree);
+    LOG(DEBUG_EEPROM, "[EEPROM]: Storing DEC steps to %" PRIi32 " (%.4f)", val, fmtFloat(decStepsPerDegree));
 
     updateInt16(DEC_STEPS_DEGREE_ADDR, val);
     updateFlags(DEC_STEPS_FLAG);
@@ -450,7 +450,7 @@ float EEPROMStore::getSpeedFactor()
         // Speed factor bytes are in split locations :-(
         int val     = readUint8(SPEED_FACTOR_LOW_ADDR) + (int) readUint8(SPEED_FACTOR_HIGH_ADDR) * 256;
         speedFactor = 1.0 + val / 10000.0;
-        LOG(DEBUG_EEPROM, "[EEPROM]: Speed Marker OK! Speed adjust is %d, speedFactor is %f", val, speedFactor);
+        LOG(DEBUG_EEPROM, "[EEPROM]: Speed Marker OK! Speed adjust is %d, speedFactor is %.4f", val, fmtFloat(speedFactor));
     }
     else
     {
@@ -466,7 +466,7 @@ void EEPROMStore::storeSpeedFactor(float speedFactor)
     // Store the fractional speed factor since it is a number very close to 1
     int32_t val = (speedFactor - 1.0f) * 10000.0f;
     val         = clamp(val, (int32_t) INT16_MIN, (int32_t) INT16_MAX);
-    LOG(DEBUG_EEPROM, "[EEPROM]: Storing Speed Factor to %" PRIi32 " (%f)", val, speedFactor);
+    LOG(DEBUG_EEPROM, "[EEPROM]: Storing Speed Factor to %" PRIi32 " (%.4f)", val, fmtFloat(speedFactor));
 
     // Speed factor bytes are in split locations :-(
     updateUint8(SPEED_FACTOR_LOW_ADDR, val & 0xFF);
@@ -529,7 +529,7 @@ void EEPROMStore::storeLatitude(Latitude const &latitude)
 {
     int32_t val = static_cast<int32_t>(roundf(latitude.getTotalHours() * 100.0f));
     val         = clamp(val, (int32_t) INT16_MIN, (int32_t) INT16_MAX);
-    LOG(DEBUG_EEPROM, "[EEPROM]: Storing Latitude as %" PRIi32 " (%f)", val, latitude.getTotalHours());
+    LOG(DEBUG_EEPROM, "[EEPROM]: Storing Latitude as %" PRIi32 " (%.4f)", val, fmtFloat(latitude.getTotalHours()));
 
     updateInt16(LATITUDE_ADDR, val);
     updateFlags(LATITUDE_FLAG);
@@ -560,7 +560,7 @@ void EEPROMStore::storeLongitude(Longitude const &longitude)
 {
     int32_t val = static_cast<int32_t>(roundf(longitude.getTotalHours() * 100.0f));
     val         = clamp(val, (int32_t) INT16_MIN, (int32_t) INT16_MAX);
-    LOG(DEBUG_EEPROM, "[EEPROM]: Storing Longitude as %" PRIi32 " (%f)", val, longitude.getTotalHours());
+    LOG(DEBUG_EEPROM, "[EEPROM]: Storing Longitude as %" PRIi32 " (%.4f)", val, fmtFloat(longitude.getTotalHours()));
 
     updateInt16(LONGITUDE_ADDR, val);
     updateFlags(LONGITUDE_FLAG);
@@ -577,10 +577,7 @@ float EEPROMStore::getPitchCalibrationAngle()
     {
         int32_t val           = readUint16(PITCH_OFFSET_ADDR);
         pitchCalibrationAngle = (val - 16384) / 100.0;
-        LOG(DEBUG_EEPROM,
-            "[EEPROM]: Pitch Offset Marker OK! Pitch Offset is %" PRIi32 " (%f)",
-            val,
-            pitchCalibrationAngle);
+        LOG(DEBUG_EEPROM, "[EEPROM]: Pitch Offset Marker OK! Pitch Offset is %" PRIi32 " (%.4f)", val, fmtFloat(pitchCalibrationAngle));
     }
     else
     {
@@ -595,7 +592,7 @@ void EEPROMStore::storePitchCalibrationAngle(float pitchCalibrationAngle)
 {
     int32_t val = (pitchCalibrationAngle * 100) + 16384;
     val         = clamp(val, (int32_t) INT16_MIN, (int32_t) INT16_MAX);
-    LOG(DEBUG_EEPROM, "[EEPROM]: Storing Pitch calibration %" PRIi32 " (%f)", val, pitchCalibrationAngle);
+    LOG(DEBUG_EEPROM, "[EEPROM]: Storing Pitch calibration %" PRIi32 " (%.4f)", val, fmtFloat(pitchCalibrationAngle));
 
     updateInt16(PITCH_OFFSET_ADDR, val);
     updateFlags(PITCH_OFFSET_FLAG);
@@ -612,10 +609,7 @@ float EEPROMStore::getRollCalibrationAngle()
     {
         int32_t val          = readUint16(ROLL_OFFSET_ADDR);
         rollCalibrationAngle = (val - 16384) / 100.0;
-        LOG(DEBUG_EEPROM,
-            "[EEPROM]: Roll Offset Marker OK! Roll Offset is %" PRIi32 " (%f)",
-            val,
-            rollCalibrationAngle);
+        LOG(DEBUG_EEPROM, "[EEPROM]: Roll Offset Marker OK! Roll Offset is %" PRIi32 " (%.4f)", val, fmtFloat(rollCalibrationAngle));
     }
     else
     {
@@ -630,7 +624,7 @@ void EEPROMStore::storeRollCalibrationAngle(float rollCalibrationAngle)
 {
     int32_t val = (rollCalibrationAngle * 100) + 16384;
     val         = clamp(val, (int32_t) INT16_MIN, (int32_t) INT16_MAX);
-    LOG(DEBUG_EEPROM, "[EEPROM]: Storing Roll calibration %" PRIi32 " (%f)", val, rollCalibrationAngle);
+    LOG(DEBUG_EEPROM, "[EEPROM]: Storing Roll calibration %" PRIi32 " (%.4f)", val, fmtFloat(rollCalibrationAngle));
 
     updateInt16(ROLL_OFFSET_ADDR, val);
     updateFlags(ROLL_OFFSET_FLAG);

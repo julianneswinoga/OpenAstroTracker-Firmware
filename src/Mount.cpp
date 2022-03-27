@@ -174,13 +174,13 @@ void Mount::readPersistentData()
     // EEPROMStore will always return valid data, even if no data is present in the store
 
     _stepsPerRADegree = EEPROMStore::getRAStepsPerDegree();
-    LOG(DEBUG_INFO, "[MOUNT]: EEPROM: RA steps/deg is %f", _stepsPerRADegree);
+    LOG(DEBUG_INFO, "[MOUNT]: EEPROM: RA steps/deg is %.4f", fmtFloat(_stepsPerRADegree));
 
     _stepsPerDECDegree = EEPROMStore::getDECStepsPerDegree();
-    LOG(DEBUG_INFO, "[MOUNT]: EEPROM: DEC steps/deg is %f", _stepsPerDECDegree);
+    LOG(DEBUG_INFO, "[MOUNT]: EEPROM: DEC steps/deg is %.4f", fmtFloat(_stepsPerDECDegree));
 
     float speed = EEPROMStore::getSpeedFactor();
-    LOG(DEBUG_INFO, "[MOUNT]: EEPROM: Speed factor is %f", speed);
+    LOG(DEBUG_INFO, "[MOUNT]: EEPROM: Speed factor is %.4f", fmtFloat(speed));
     setSpeedCalibration(speed, false);
 
     _backlashCorrectionSteps = EEPROMStore::getBacklashCorrectionSteps();
@@ -197,10 +197,10 @@ void Mount::readPersistentData()
 
 #if USE_GYRO_LEVEL == 1
     _pitchCalibrationAngle = EEPROMStore::getPitchCalibrationAngle();
-    LOG(DEBUG_INFO, "[MOUNT]: EEPROM: Pitch Offset is %f", _pitchCalibrationAngle);
+    LOG(DEBUG_INFO, "[MOUNT]: EEPROM: Pitch Offset is %.4f", fmtFloat(_pitchCalibrationAngle));
 
     _rollCalibrationAngle = EEPROMStore::getRollCalibrationAngle();
-    LOG(DEBUG_INFO, "[MOUNT]: EEPROM: Roll Offset is %f", _rollCalibrationAngle);
+    LOG(DEBUG_INFO, "[MOUNT]: EEPROM: Roll Offset is %.4f", fmtFloat(_rollCalibrationAngle));
 #endif
 
     _raParkingPos  = EEPROMStore::getRAParkingPos();
@@ -791,18 +791,18 @@ float Mount::getSpeedCalibration()
 /////////////////////////////////
 void Mount::setSpeedCalibration(float val, bool saveToStorage)
 {
-    LOG(DEBUG_MOUNT, "[MOUNT]: Updating speed calibration from %f to %f", _trackingSpeedCalibration, val);
+    LOG(DEBUG_MOUNT, "[MOUNT]: Updating speed calibration from %.4f to %.4f", fmtFloat(_trackingSpeedCalibration), fmtFloat(val));
     _trackingSpeedCalibration = val;
 
-    LOG(DEBUG_MOUNT, "[MOUNT]: Current tracking speed is %f steps/sec", _trackingSpeed);
+    LOG(DEBUG_MOUNT, "[MOUNT]: Current tracking speed is %.4f steps/sec", fmtFloat(_trackingSpeed));
 
     // Tracking speed has to be exactly the rotation speed of the earth. The earth rotates 360° per astronomical day.
     // This is 23h 56m 4.0905s, therefore the dimensionless _trackingSpeedCalibration = (23h 56m 4.0905s / 24 h) * mechanical calibration factor
     // Also compensate for higher precision microstepping in tracking mode
     _trackingSpeed = _trackingSpeedCalibration * _stepsPerRADegree * (RA_TRACKING_MICROSTEPPING / RA_SLEW_MICROSTEPPING) * 360.0f
                      / secondsPerDay;  // (fraction of day) * u-steps/deg * (u-steps/u-steps) * deg / (sec/day) = u-steps / sec
-    LOG(DEBUG_MOUNT, "[MOUNT]: RA steps per degree is %f steps/deg", _stepsPerRADegree);
-    LOG(DEBUG_MOUNT, "[MOUNT]: New tracking speed is %f steps/sec", _trackingSpeed);
+    LOG(DEBUG_MOUNT, "[MOUNT]: RA steps per degree is %.4f steps/deg", fmtFloat(_stepsPerRADegree));
+    LOG(DEBUG_MOUNT, "[MOUNT]: New tracking speed is %.4f steps/sec", fmtFloat(_trackingSpeed));
 
     LOG(DEBUG_MOUNT, "[MOUNT]: FactorToSpeed : %s, %s", String(val, 6).c_str(), String(_trackingSpeed, 6).c_str());
 
@@ -812,7 +812,7 @@ void Mount::setSpeedCalibration(float val, bool saveToStorage)
     // If we are currently tracking, update the speed. No need to update microstepping mode
     if (isSlewingTRK())
     {
-        LOG(DEBUG_STEPPERS, "[MOUNT]: SpeedCalibration TRK.setSpeed(%f)", _trackingSpeed);
+        LOG(DEBUG_STEPPERS, "[MOUNT]: SpeedCalibration TRK.setSpeed(%.4f)", fmtFloat(_trackingSpeed));
         _stepperTRK->setSpeed(_trackingSpeed);
     }
 }
@@ -1053,10 +1053,13 @@ void Mount::setSlewRate(int rate)
 {
     _moveRate           = clamp(rate, 1, 4);
     float speedFactor[] = {0, 0.05, 0.2, 0.5, 1.0};
-    LOG(DEBUG_MOUNT, "[MOUNT]: setSlewRate, rate is %d -> %f", _moveRate, speedFactor[_moveRate]);
+    LOG(DEBUG_MOUNT, "[MOUNT]: setSlewRate, rate is %d -> %.4f", _moveRate, fmtFloat(speedFactor[_moveRate]));
     _stepperDEC->setMaxSpeed(speedFactor[_moveRate] * _maxDECSpeed);
     _stepperRA->setMaxSpeed(speedFactor[_moveRate] * _maxRASpeed);
-    LOG(DEBUG_MOUNT, "[MOUNT]: setSlewRate, new speeds are RA: %f  DEC: %f", _stepperRA->maxSpeed(), _stepperDEC->maxSpeed());
+    LOG(DEBUG_MOUNT,
+        "[MOUNT]: setSlewRate, new speeds are RA: %.4f  DEC: %.4f",
+        fmtFloat(_stepperRA->maxSpeed()),
+        fmtFloat(_stepperDEC->maxSpeed()));
 }
 
 /////////////////////////////////
@@ -1241,7 +1244,11 @@ void Mount::syncPosition(DayTime ra, Declination dec)
 
     // Adjust the home RA position by the delta sync position.
     float raAdjust = ra.getTotalHours() - currentRA().getTotalHours();
-    LOG(DEBUG_COORD_CALC, "[MOUNT]: syncPosition: AdjustRA is %f  (%f - %f)", raAdjust, ra.getTotalHours(), currentRA().getTotalHours());
+    LOG(DEBUG_COORD_CALC,
+        "[MOUNT]: syncPosition: AdjustRA is %.4f  (%.4f - %.4f)",
+        fmtFloat(raAdjust),
+        fmtFloat(ra.getTotalHours()),
+        fmtFloat(currentRA().getTotalHours()));
     while (raAdjust > 12)
     {
         raAdjust -= 24;
@@ -1250,9 +1257,9 @@ void Mount::syncPosition(DayTime ra, Declination dec)
     {
         raAdjust += 24;
     }
-    LOG(DEBUG_COORD_CALC, "[MOUNT]: syncPosition: AdjustRA is %f", raAdjust);
+    LOG(DEBUG_COORD_CALC, "[MOUNT]: syncPosition: AdjustRA is %.4f", fmtFloat(raAdjust));
     _zeroPosRA.addHours(raAdjust);
-    LOG(DEBUG_COORD_CALC, "[MOUNT]: syncPosition: ZeroPosRA is now %f", _zeroPosRA.getTotalHours());
+    LOG(DEBUG_COORD_CALC, "[MOUNT]: syncPosition: ZeroPosRA is now %.4f", fmtFloat(_zeroPosRA.getTotalHours()));
 
     // Adjust the home DEC position by the delta between the sync'd target and current position.
     const float degreePos = (_stepperDEC->currentPosition() / _stepsPerDECDegree) + _zeroPosDEC;  // u-steps / u-steps/deg = deg
@@ -1262,8 +1269,8 @@ void Mount::syncPosition(DayTime ra, Declination dec)
         decAdjust = -decAdjust;
     }
     _zeroPosDEC += decAdjust;
-    LOG(DEBUG_COORD_CALC, "[MOUNT]: syncPosition: _zerPosDEC adjusted by: %f", decAdjust);
-    LOG(DEBUG_COORD_CALC, "[MOUNT]: syncPosition: _zerPosDEC: %f", _zeroPosDEC);
+    LOG(DEBUG_COORD_CALC, "[MOUNT]: syncPosition: _zerPosDEC adjusted by: %.4f", fmtFloat(decAdjust));
+    LOG(DEBUG_COORD_CALC, "[MOUNT]: syncPosition: _zerPosDEC: %.4f", fmtFloat(_zeroPosDEC));
 
     long targetRAPosition, targetDECPosition;
     calculateRAandDECSteppers(targetRAPosition, targetDECPosition, solutions);
@@ -1413,7 +1420,7 @@ void Mount::stopGuiding(bool ra, bool dec)
     // Stop RA guide first, since it's just a speed change back to tracking speed
     if (ra && (_mountStatus & STATUS_GUIDE_PULSE_RA))
     {
-        LOG(DEBUG_STEPPERS, "[STEPPERS]: stopGuiding(RA): TRK.setSpeed(%f)", _trackingSpeed);
+        LOG(DEBUG_STEPPERS, "[STEPPERS]: stopGuiding(RA): TRK.setSpeed(%.4f)", fmtFloat(_trackingSpeed));
         _stepperTRK->setSpeed(_trackingSpeed);
         _mountStatus &= ~STATUS_GUIDE_PULSE_RA;
     }
@@ -1469,14 +1476,14 @@ void Mount::guidePulse(byte direction, int duration)
     switch (direction)
     {
         case NORTH:
-            LOG(DEBUG_STEPPERS, "[STEPPERS]: guidePulse:  DEC.setSpeed(%f)", DEC_PULSE_MULTIPLIER * decGuidingSpeed);
+            LOG(DEBUG_STEPPERS, "[STEPPERS]: guidePulse:  DEC.setSpeed(%.4f)", fmtFloat(DEC_PULSE_MULTIPLIER * decGuidingSpeed));
             _stepperGUIDE->setSpeed(DEC_PULSE_MULTIPLIER * decGuidingSpeed);
             _mountStatus |= STATUS_GUIDE_PULSE | STATUS_GUIDE_PULSE_DEC;
             _guideDecEndTime = millis() + duration;
             break;
 
         case SOUTH:
-            LOG(DEBUG_STEPPERS, "[STEPPERS]: guidePulse:  DEC.setSpeed(%f)", -DEC_PULSE_MULTIPLIER * decGuidingSpeed);
+            LOG(DEBUG_STEPPERS, "[STEPPERS]: guidePulse:  DEC.setSpeed(%.4f)", fmtFloat(-DEC_PULSE_MULTIPLIER * decGuidingSpeed));
             _stepperGUIDE->setSpeed(-DEC_PULSE_MULTIPLIER * decGuidingSpeed);
             _mountStatus |= STATUS_GUIDE_PULSE | STATUS_GUIDE_PULSE_DEC;
             _guideDecEndTime = millis() + duration;
@@ -1484,7 +1491,7 @@ void Mount::guidePulse(byte direction, int duration)
 
         case WEST:
             // We were in tracking mode before guiding, so no need to update microstepping mode on RA driver
-            LOG(DEBUG_STEPPERS, "[STEPPERS]: guidePulse:  TRK.setSpeed(%f)", (RA_PULSE_MULTIPLIER * raGuidingSpeed));
+            LOG(DEBUG_STEPPERS, "[STEPPERS]: guidePulse:  TRK.setSpeed(%.4f)", fmtFloat(RA_PULSE_MULTIPLIER * raGuidingSpeed));
             _stepperTRK->setSpeed(RA_PULSE_MULTIPLIER * raGuidingSpeed);  // Faster than siderael
             _mountStatus |= STATUS_GUIDE_PULSE | STATUS_GUIDE_PULSE_RA;
             _guideRaEndTime = millis() + duration;
@@ -1492,7 +1499,7 @@ void Mount::guidePulse(byte direction, int duration)
 
         case EAST:
             // We were in tracking mode before guiding, so no need to update microstepping mode on RA driver
-            LOG(DEBUG_STEPPERS, "[STEPPERS]: guidePulse:  TRK.setSpeed(%f)", (raGuidingSpeed * (2.0f - RA_PULSE_MULTIPLIER)));
+            LOG(DEBUG_STEPPERS, "[STEPPERS]: guidePulse:  TRK.setSpeed(%.4f)", fmtFloat(raGuidingSpeed * (2.0f - RA_PULSE_MULTIPLIER)));
             _stepperTRK->setSpeed(raGuidingSpeed * (2.0f - RA_PULSE_MULTIPLIER));  // Slower than siderael
             _mountStatus |= STATUS_GUIDE_PULSE | STATUS_GUIDE_PULSE_RA;
             _guideRaEndTime = millis() + duration;
@@ -1606,14 +1613,20 @@ void Mount::setSpeed(StepperAxis which, float speedDegsPerSec)
     if (which == RA_STEPS)
     {
         float stepsPerSec = speedDegsPerSec * _stepsPerRADegree;  // deg/sec * u-steps/deg = u-steps/sec
-        LOG(DEBUG_STEPPERS, "[STEPPERS]: setSpeed: Set RA speed %f degs/s, which is %f steps/s", speedDegsPerSec, stepsPerSec);
+        LOG(DEBUG_STEPPERS,
+            "[STEPPERS]: setSpeed: Set RA speed %.4f degs/s, which is %.4f steps/s",
+            fmtFloat(speedDegsPerSec),
+            fmtFloat(stepsPerSec));
         // TODO: Are we already in slew mode?
         _stepperRA->setSpeed(stepsPerSec);
     }
     else if (which == DEC_STEPS)
     {
         float stepsPerSec = speedDegsPerSec * _stepsPerDECDegree;  // deg/sec * u-steps/deg = u-steps/sec
-        LOG(DEBUG_STEPPERS, "[STEPPERS]: setSpeed: Set DEC speed %f degs/s, which is %f steps/s", speedDegsPerSec, stepsPerSec);
+        LOG(DEBUG_STEPPERS,
+            "[STEPPERS]: setSpeed: Set DEC speed %.4f degs/s, which is %.4f steps/s",
+            fmtFloat(speedDegsPerSec),
+            fmtFloat(stepsPerSec));
         // TODO: Are we already in slew mode?
         _stepperDEC->setSpeed(stepsPerSec);
     }
@@ -1621,7 +1634,10 @@ void Mount::setSpeed(StepperAxis which, float speedDegsPerSec)
     else if (which == AZIMUTH_STEPS)
     {
         float stepsPerSec = speedDegsPerSec * _stepsPerAZDegree;  // deg/sec * u-steps/deg = u-steps/sec
-        LOG(DEBUG_STEPPERS, "[STEPPERS]: setSpeed: Set AZ speed %f degs/s, which is %f steps/s", speedDegsPerSec, stepsPerSec);
+        LOG(DEBUG_STEPPERS,
+            "[STEPPERS]: setSpeed: Set AZ speed %.4f degs/s, which is %.4f steps/s",
+            fmtFloat(speedDegsPerSec),
+            fmtFloat(stepsPerSec));
         _stepperAZ->setSpeed(stepsPerSec);
     }
 #endif
@@ -1629,7 +1645,10 @@ void Mount::setSpeed(StepperAxis which, float speedDegsPerSec)
     else if (which == ALTITUDE_STEPS)
     {
         float stepsPerSec = speedDegsPerSec * _stepsPerALTDegree;  // deg/sec * u-steps/deg = u-steps/sec
-        LOG(DEBUG_STEPPERS, "[STEPPERS]: setSpeed: Set ALT speed %f degs/s, which is %f steps/s", speedDegsPerSec, stepsPerSec);
+        LOG(DEBUG_STEPPERS,
+            "[STEPPERS]: setSpeed: Set ALT speed %.4f degs/s, which is %.4f steps/s",
+            fmtFloat(speedDegsPerSec),
+            fmtFloat(stepsPerSec));
         _stepperALT->setSpeed(stepsPerSec);
     }
 #endif
@@ -1637,12 +1656,12 @@ void Mount::setSpeed(StepperAxis which, float speedDegsPerSec)
 #if (FOCUS_STEPPER_TYPE != STEPPER_TYPE_NONE)
     else if (which == FOCUS_STEPS)
     {
-        LOG(DEBUG_MOUNT | DEBUG_FOCUS, "[FOCUS]: setSpeed() Focuser setSpeed %f", speedDegsPerSec);
+        LOG(DEBUG_MOUNT | DEBUG_FOCUS, "[FOCUS]: setSpeed() Focuser setSpeed %.4f", fmtFloat(speedDegsPerSec));
         if (speedDegsPerSec != 0)
         {
             LOG(DEBUG_STEPPERS | DEBUG_FOCUS,
-                "[FOCUS]: Mount:setSpeed(): Enabling motor, setting speed to %f. Continuous",
-                speedDegsPerSec);
+                "[FOCUS]: Mount:setSpeed(): Enabling motor, setting speed to %.4f. Continuous",
+                fmtFloat(speedDegsPerSec));
             enableFocusMotor();
             _stepperFocus->setMaxSpeed(speedDegsPerSec);
             _stepperFocus->moveTo(sign(speedDegsPerSec) * 300000);
@@ -1815,11 +1834,11 @@ void Mount::focusSetSpeedByRate(int rate)
     float speedFactor[] = {0, 0.05, 0.2, 0.5, 1.0};
     _maxFocusRateSpeed  = speedFactor[_focusRate] * _maxFocusSpeed;
     LOG(DEBUG_FOCUS,
-        "[FOCUS]: focusSetSpeedByRate: rate is %d, factor %f, maxspeed %f -> %f",
+        "[FOCUS]: focusSetSpeedByRate: rate is %d, factor %.4f, maxspeed %.4f -> %.4f",
         _focusRate,
-        speedFactor[_focusRate],
-        _maxFocusSpeed,
-        _maxFocusRateSpeed);
+        fmtFloat(speedFactor[_focusRate]),
+        fmtFloat(_maxFocusSpeed),
+        fmtFloat(_maxFocusRateSpeed));
     _stepperFocus->setMaxSpeed(_maxFocusRateSpeed);
 
     if (_stepperFocus->isRunning())
@@ -1837,7 +1856,7 @@ void Mount::focusSetSpeedByRate(int rate)
 void Mount::focusContinuousMove(FocuserDirection direction)
 {
     // maxSpeed is set to what the rate dictates
-    LOG(DEBUG_FOCUS, "[FOCUS]: focusContinuousMove: direction is %d, maxspeed %f", direction, _maxFocusRateSpeed);
+    LOG(DEBUG_FOCUS, "[FOCUS]: focusContinuousMove: direction is %d, maxspeed %.4f", direction, fmtFloat(_maxFocusRateSpeed));
     setSpeed(FOCUS_STEPS, static_cast<int>(direction) * _maxFocusRateSpeed);
 }
 
@@ -2842,7 +2861,7 @@ void Mount::loop()
 
     if (_stepperFocus->isRunning())
     {
-        LOG(DEBUG_FOCUS, "[MOUNT]: Loop: Focuser running at speed %f", _stepperFocus->speed());
+        LOG(DEBUG_FOCUS, "[MOUNT]: Loop: Focuser running at speed %.4f", fmtFloat(_stepperFocus->speed()));
         _focuserWasRunning = true;
     }
     else if (_focuserWasRunning)
@@ -3003,11 +3022,11 @@ void Mount::loop()
                         _totalDECMove = 1.0f * _stepperDEC->distanceToGo();
                         _totalRAMove  = 1.0f * _stepperRA->distanceToGo();
                         LOG(DEBUG_MOUNT | DEBUG_STEPPERS,
-                            "[MOUNT]: Loop:   Park Position is R:%lu  D:%lu, TotalMove is R:%f, D:%f",
+                            "[MOUNT]: Loop:   Park Position is R:%lu  D:%lu, TotalMove is R:%.4f, D:%.4f",
                             _raParkingPos,
                             _decParkingPos,
-                            _totalRAMove,
-                            _totalDECMove);
+                            fmtFloat(_totalRAMove),
+                            fmtFloat(_totalDECMove));
                         if ((_stepperDEC->distanceToGo() != 0) || (_stepperRA->distanceToGo() != 0))
                         {
                             _mountStatus |= STATUS_PARKING_POS | STATUS_SLEWING;
@@ -3243,7 +3262,7 @@ void Mount::calculateRAandDECSteppers(long &targetRASteps, long &targetDECSteps,
     LOG(DEBUG_COORD_CALC, "[MOUNT]: CalcSteppersPre: Current : RA: %s, DEC: %s", currentRA().ToString(), currentDEC().ToString());
     LOG(DEBUG_COORD_CALC, "[MOUNT]: CalcSteppersPre: Target  : RA: %s, DEC: %s", _targetRA.ToString(), _targetDEC.ToString());
     LOG(DEBUG_COORD_CALC, "[MOUNT]: CalcSteppersPre: ZeroRA  : %s", _zeroPosRA.ToString());
-    LOG(DEBUG_COORD_CALC, "[MOUNT]: CalcSteppersPre: ZeroDEC : %f", _zeroPosDEC);
+    LOG(DEBUG_COORD_CALC, "[MOUNT]: CalcSteppersPre: ZeroDEC : %.4f", fmtFloat(_zeroPosDEC));
     LOG(DEBUG_COORD_CALC,
         "[MOUNT]: CalcSteppersPre: Stepper: RA: %lu, DEC: %lu, TRK: %lu",
         _stepperRA->currentPosition(),
@@ -3267,7 +3286,10 @@ void Mount::calculateRAandDECSteppers(long &targetRASteps, long &targetDECSteps,
 
     // Total hours of tracking-to-date
     float trackedHours = (_stepperTRK->currentPosition() / _trackingSpeed) / 3600.0F;  // steps / steps/s / 3600 = hours
-    LOG(DEBUG_COORD_CALC, "[MOUNT]: CalcSteppersIn: Tracked time is %lu steps (%f h).", _stepperTRK->currentPosition(), trackedHours);
+    LOG(DEBUG_COORD_CALC,
+        "[MOUNT]: CalcSteppersIn: Tracked time is %lu steps (%.4f h).",
+        _stepperTRK->currentPosition(),
+        fmtFloat(trackedHours));
 
     // The current RA of the home position, taking tracking-to-date into account
     float homeRA = _zeroPosRA.getTotalHours() + trackedHours;
@@ -3299,7 +3321,11 @@ void Mount::calculateRAandDECSteppers(long &targetRASteps, long &targetDECSteps,
     // Where do we want to move DEC to?
     float moveDEC = decTarget.getTotalDegrees();
 
-    LOG(DEBUG_COORD_CALC, "[MOUNT]: CalcSteppersIn: Target hrs pos RA: %f (regRA: %f), DEC: %f", homeTargetDeltaRA, moveRA, moveDEC);
+    LOG(DEBUG_COORD_CALC,
+        "[MOUNT]: CalcSteppersIn: Target hrs pos RA: %.4f (regRA: %.4f), DEC: %.4f",
+        fmtFloat(homeTargetDeltaRA),
+        fmtFloat(moveRA),
+        fmtFloat(moveDEC));
 
     /*
   * Current RA wheel has a rotation limit of around 7 hours in each direction from home position.
@@ -3317,7 +3343,7 @@ void Mount::calculateRAandDECSteppers(long &targetRASteps, long &targetDECSteps,
     float const RALimitL = -RA_LIMIT_RIGHT;
     float const RALimitR = RA_LIMIT_LEFT;
 #endif
-    LOG(DEBUG_COORD_CALC, "[MOUNT]: CalcSteppersIn: Limits are : %f to %f", RALimitL, RALimitR);
+    LOG(DEBUG_COORD_CALC, "[MOUNT]: CalcSteppersIn: Limits are : %.4f to %.4f", fmtFloat(RALimitL), fmtFloat(RALimitR));
 
     if (pSolutions != nullptr)
     {
@@ -3329,50 +3355,50 @@ void Mount::calculateRAandDECSteppers(long &targetRASteps, long &targetDECSteps,
         pSolutions[5] = long(-moveDEC) * _stepsPerDECDegree;
     }
 
-    LOG(DEBUG_COORD_CALC, "[MOUNT]: CalcSteppersIn: Solution 1: %f, %f", -moveRA, moveDEC);
-    LOG(DEBUG_COORD_CALC, "[MOUNT]: CalcSteppersIn: Solution 2: %f, %f", -(moveRA - 12.0f), -moveDEC);
-    LOG(DEBUG_COORD_CALC, "[MOUNT]: CalcSteppersIn: Solution 3: %f, %f", -(moveRA + 12.0f), -moveDEC);
+    LOG(DEBUG_COORD_CALC, "[MOUNT]: CalcSteppersIn: Solution 1: %.4f, %.4f", fmtFloat(-moveRA), fmtFloat(moveDEC));
+    LOG(DEBUG_COORD_CALC, "[MOUNT]: CalcSteppersIn: Solution 2: %.4f, %.4f", fmtFloat(-(moveRA - 12.0f)), fmtFloat(-moveDEC));
+    LOG(DEBUG_COORD_CALC, "[MOUNT]: CalcSteppersIn: Solution 3: %.4f, %.4f", fmtFloat(-(moveRA + 12.0f)), fmtFloat(-moveDEC));
 
     // If we reach the limit in the positive direction ...
     if (homeTargetDeltaRA > RALimitR)
     {
         LOG(DEBUG_COORD_CALC,
-            "[MOUNT]: CalcSteppersIn: targetRA %f (RA:%f) is past max limit %f  (solution 2)",
-            homeTargetDeltaRA,
-            moveRA,
-            RALimitR);
+            "[MOUNT]: CalcSteppersIn: targetRA %.4f (RA:%.4f) is past max limit %.4f  (solution 2)",
+            fmtFloat(homeTargetDeltaRA),
+            fmtFloat(moveRA),
+            fmtFloat(RALimitR));
 
         // ... turn both RA and DEC axis around
         moveRA -= 12.0f;
         moveDEC = -moveDEC;
-        LOG(DEBUG_COORD_CALC, "[MOUNT]: CalcSteppersIn: Adjusted Target. RA: %f, DEC: %f", moveRA, moveDEC);
+        LOG(DEBUG_COORD_CALC, "[MOUNT]: CalcSteppersIn: Adjusted Target. RA: %.4f, DEC: %.4f", fmtFloat(moveRA), fmtFloat(moveDEC));
     }
     // If we reach the limit in the negative direction...
     else if (homeTargetDeltaRA < RALimitL)
     {
         LOG(DEBUG_COORD_CALC,
-            "[MOUNT]: CalcSteppersIn: targetRA %f (RA:%f) is past min limit: %f, (solution 3)",
-            homeTargetDeltaRA,
-            moveRA,
-            RALimitL);
+            "[MOUNT]: CalcSteppersIn: targetRA %.4f (RA:%.4f) is past min limit: %.4f, (solution 3)",
+            fmtFloat(homeTargetDeltaRA),
+            fmtFloat(moveRA),
+            fmtFloat(RALimitL));
         // ... turn both RA and DEC axis around
 
         moveRA += 12.0f;
         moveDEC = -moveDEC;
-        LOG(DEBUG_COORD_CALC, "[MOUNT]: CalcSteppersIn: Adjusted Target. RA: %f, DEC: %f", moveRA, moveDEC);
+        LOG(DEBUG_COORD_CALC, "[MOUNT]: CalcSteppersIn: Adjusted Target. RA: %.4f, DEC: %.4f", fmtFloat(moveRA), fmtFloat(moveDEC));
     }
     else
     {
         LOG(DEBUG_COORD_CALC,
-            "[MOUNT]: CalcSteppersIn: targetRA %f is in range. RA: %f, DEC: %f  (solution 1)",
-            homeTargetDeltaRA,
-            moveRA,
-            moveDEC);
+            "[MOUNT]: CalcSteppersIn: targetRA %.4f is in range. RA: %.4f, DEC: %.4f  (solution 1)",
+            fmtFloat(homeTargetDeltaRA),
+            fmtFloat(moveRA),
+            fmtFloat(moveDEC));
     }
 
     moveDEC -= _zeroPosDEC;  // deg
-    LOG(DEBUG_COORD_CALC, "[MOUNT]: CalcSteppersIn: _zeroPosDEC: %f", _zeroPosDEC);
-    LOG(DEBUG_COORD_CALC, "[MOUNT]: CalcSteppersIn: Adjusted moveDEC: %f", moveDEC);
+    LOG(DEBUG_COORD_CALC, "[MOUNT]: CalcSteppersIn: _zeroPosDEC: %.4f", fmtFloat(_zeroPosDEC));
+    LOG(DEBUG_COORD_CALC, "[MOUNT]: CalcSteppersIn: Adjusted moveDEC: %.4f", fmtFloat(moveDEC));
 
     targetRASteps  = -moveRA * stepsPerSiderealHour;
     targetDECSteps = moveDEC * _stepsPerDECDegree;
@@ -3388,8 +3414,14 @@ void Mount::moveSteppersTo(float targetRASteps, float targetDECSteps)
 {  // Units are u-steps (in slew mode)
     // Show time: tell the steppers where to go!
     _correctForBacklash = false;
-    LOG(DEBUG_STEPPERS, "[STEPPERS]: MoveSteppersTo: RA  From: %lu  To: %f", _stepperRA->currentPosition(), targetRASteps);
-    LOG(DEBUG_STEPPERS, "[STEPPERS]: MoveSteppersTo: DEC From: %lu  To: %f", _stepperDEC->currentPosition(), targetDECSteps);
+    LOG(DEBUG_STEPPERS,
+        "[STEPPERS]: MoveSteppersTo: RA  From: %lu  To: %.4f",
+        _stepperRA->currentPosition(),
+        static_cast<double>(targetRASteps));
+    LOG(DEBUG_STEPPERS,
+        "[STEPPERS]: MoveSteppersTo: DEC From: %lu  To: %.4f",
+        _stepperDEC->currentPosition(),
+        static_cast<double>(targetDECSteps));
 
     if ((_backlashCorrectionSteps != 0) && ((_stepperRA->currentPosition() - targetRASteps) > 0))
     {
@@ -3403,12 +3435,12 @@ void Mount::moveSteppersTo(float targetRASteps, float targetDECSteps)
     if (_decUpperLimit != 0)
     {
         targetDECSteps = min(targetDECSteps, (float) _decUpperLimit);
-        LOG(DEBUG_STEPPERS, "[STEPPERS]: MoveSteppersTo: DEC Upper Limit enforced. To: %f", targetDECSteps);
+        LOG(DEBUG_STEPPERS, "[STEPPERS]: MoveSteppersTo: DEC Upper Limit enforced. To: %.4f", static_cast<double>(targetDECSteps));
     }
     if (_decLowerLimit != 0)
     {
         targetDECSteps = max(targetDECSteps, (float) _decLowerLimit);
-        LOG(DEBUG_STEPPERS, "[STEPPERS]: MoveSteppersTo: DEC Lower Limit enforced. To: %f", targetDECSteps);
+        LOG(DEBUG_STEPPERS, "[STEPPERS]: MoveSteppersTo: DEC Lower Limit enforced. To: %.4f", static_cast<double>(targetDECSteps));
     }
 
     _stepperDEC->moveTo(targetDECSteps);
@@ -3878,15 +3910,15 @@ void Mount::checkRALimit()
         if (hourPos < 0)
             hourPos += 24;
     }
-    LOG(DEBUG_MOUNT_VERBOSE, "[MOUNT]: checkRALimit: homeRA: %f", homeRA);
-    LOG(DEBUG_MOUNT_VERBOSE, "[MOUNT]: checkRALimit: currentRA: %f", currentRA().getTotalHours());
-    LOG(DEBUG_MOUNT_VERBOSE, "[MOUNT]: checkRALimit: currentRA (adjusted): %f", hourPos);
+    LOG(DEBUG_MOUNT_VERBOSE, "[MOUNT]: checkRALimit: homeRA: %.4f", fmtFloat(homeRA));
+    LOG(DEBUG_MOUNT_VERBOSE, "[MOUNT]: checkRALimit: currentRA: %.4f", fmtFloat(currentRA().getTotalHours()));
+    LOG(DEBUG_MOUNT_VERBOSE, "[MOUNT]: checkRALimit: currentRA (adjusted): %.4f", fmtFloat(hourPos));
     float homeCurrentDeltaRA = homeRA - hourPos;
     while (homeCurrentDeltaRA > 12)
         homeCurrentDeltaRA -= 24;
     while (homeCurrentDeltaRA < -12)
         homeCurrentDeltaRA += 24;
-    LOG(DEBUG_MOUNT_VERBOSE, "[MOUNT]: checkRALimit: homeRAdelta: %f", homeCurrentDeltaRA);
+    LOG(DEBUG_MOUNT_VERBOSE, "[MOUNT]: checkRALimit: homeRAdelta: %.4f", fmtFloat(homeCurrentDeltaRA));
 
     if (homeCurrentDeltaRA > RALimit)
     {

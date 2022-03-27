@@ -347,7 +347,7 @@ void setup()
     mount.configureFocusStepper(FOCUSmotorPin1, FOCUSmotorPin2, FOCUS_STEPPER_SPEED, FOCUS_STEPPER_ACCELERATION);
     #if FOCUS_DRIVER_TYPE == DRIVER_TYPE_TMC2209_UART
     LOG(DEBUG_ANY, "[STEPPERS]: setup(): Configure Focus driver...");
-    LOG(DEBUG_FOCUS, "[FOCUS]: setup(): RSense %f, RMS Current %fmA", R_SENSE, FOCUS_RMSCURRENT);
+    LOG(DEBUG_FOCUS, "[FOCUS]: setup(): RSense %.4f, RMS Current %.4fmA", fmtFloat(R_SENSE), fmtFloat(FOCUS_RMSCURRENT));
         #if SW_SERIAL_UART == 0
     mount.configureFocusDriver(&FOCUS_SERIAL_PORT, R_SENSE, FOCUS_DRIVER_ADDRESS, FOCUS_RMSCURRENT, FOCUS_STALL_VALUE);
         #elif SW_SERIAL_UART == 1

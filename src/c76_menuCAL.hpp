@@ -579,13 +579,13 @@ bool processCalibrationKeys()
                         auto angles = Gyro::getCurrentAngles();
                         if (setRollZeroPoint)
                         {
-                            LOG(DEBUG_GYRO, "[CAL]: Confirmed Roll offset is %f", angles.rollAngle);
+                            LOG(DEBUG_GYRO, "[CAL]: Confirmed Roll offset is %.4f", fmtFloat(angles.rollAngle));
                             mount.setRollCalibrationAngle(angles.rollAngle);
-                            LOG(DEBUG_GYRO, "[CAL]: New Roll offset is %f", mount.getRollCalibrationAngle());
+                            LOG(DEBUG_GYRO, "[CAL]: New Roll offset is %.4f", fmtFloat(mount.getRollCalibrationAngle()));
                         }
                         else
                         {
-                            LOG(DEBUG_GYRO, "[CAL]: Did not confirm, Roll offset was %f", angles.rollAngle);
+                            LOG(DEBUG_GYRO, "[CAL]: Did not confirm, Roll offset was %.4f", fmtFloat(angles.rollAngle));
                         }
                         calState       = HIGHLIGHT_ROLL_LEVEL;
                         okToUpdateMenu = true;
@@ -625,12 +625,12 @@ bool processCalibrationKeys()
                         auto angles = Gyro::getCurrentAngles();
                         if (setPitchZeroPoint)
                         {
-                            LOG(DEBUG_GYRO, "[CAL]: Confirmed Pitch offset is %f", angles.pitchAngle);
+                            LOG(DEBUG_GYRO, "[CAL]: Confirmed Pitch offset is %.4f", fmtFloat(angles.pitchAngle));
                             mount.setPitchCalibrationAngle(angles.pitchAngle);
                         }
                         else
                         {
-                            LOG(DEBUG_GYRO, "[CAL]: Did not confirm, Pitch offset was %f", angles.pitchAngle);
+                            LOG(DEBUG_GYRO, "[CAL]: Did not confirm, Pitch offset was %.4f", fmtFloat(angles.pitchAngle));
                         }
                         calState       = HIGHLIGHT_PITCH_LEVEL;
                         okToUpdateMenu = true;

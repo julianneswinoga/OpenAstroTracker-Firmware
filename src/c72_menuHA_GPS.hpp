@@ -49,7 +49,7 @@ bool gpsAqcuisitionComplete(int &indicator)
             if ((gps.location.lng() != 0) && (gps.location.age() < 30000UL))
             {
                 LOG(DEBUG_INFO, "[GPS]: Sync'd GPS location. Age is %d secs", gps.location.age() / 1000);
-                LOG(DEBUG_INFO, "[GPS]: Location: %f  %f", gps.location.lat(), gps.location.lng());
+                LOG(DEBUG_INFO, "[GPS]: Location: %.4f  %.4f", fmtFloat(gps.location.lat()), fmtFloat(gps.location.lng()));
                 LOG(DEBUG_INFO, "[GPS]: UTC time is %dh%dm%ds", gps.time.hour(), gps.time.minute(), gps.time.second());
                 lcdMenu.printMenu("GPS sync'd....");
 
