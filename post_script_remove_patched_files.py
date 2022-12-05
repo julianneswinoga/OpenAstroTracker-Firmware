@@ -23,7 +23,11 @@ def clean_up_patched_files(*_, **__):
             patched_filepaths.append(full_filepath)
     for patched_filepath in patched_filepaths:
         cprint(f'Removing {patched_filepath}')
-        os.remove(patched_filepath)
+        try:
+            # os.remove(patched_filepath)
+            pass
+        except FileNotFoundError:
+            cprint('Not found (deleted already?)')
 
 
 env.AddPostAction('buildprog', clean_up_patched_files)
