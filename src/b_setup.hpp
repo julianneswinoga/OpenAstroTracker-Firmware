@@ -99,7 +99,6 @@ void stepperControlTimerCallback(void *payload)
 // Main program setup
 //
 /////////////////////////////////
-Adafruit_USBD_CDC USBSer1;
 
 void setup()
 {
@@ -115,17 +114,6 @@ void setup()
     delay(1500);
     #if DEBUG_LEVEL > 0 && DEBUG_SEPARATE_SERIAL == 1
     DEBUG_SERIAL_PORT.begin(DEBUG_SERIAL_BAUDRATE);
-    if (TinyUSBDevice.mounted()) {
-        TinyUSBDevice.detach();
-        delay(10);
-        TinyUSBDevice.attach();
-    }
-    while (!Serial) {
-        if (DEBUG_SERIAL_PORT) {
-            DEBUG_SERIAL_PORT.println("Waiting for other USB ports");
-        }
-        delay(1000);
-    }
     #endif
 #endif
 

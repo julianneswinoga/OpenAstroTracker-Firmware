@@ -14,9 +14,7 @@
 PUSH_NO_WARNINGS
 #include <Arduino.h>
 #include <WString.h>
-#include <Adafruit_TinyUSB.h>
 POP_NO_WARNINGS
 
 extern bool inSerialControl;  // True when the serial port is in control
 extern bool inNorthernHemisphere;
-extern Adafruit_USBD_CDC USBSer1;
