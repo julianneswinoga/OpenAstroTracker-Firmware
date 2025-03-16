@@ -17,7 +17,7 @@ const float SteppingStorageNormalized = 25600.0;
 
 #if USE_DUMMY_EEPROM == true
 
-static uint8_t dummyEepromStorage[EEPROMStore::STORE_SIZE];
+static uint8_t dummyEepromStorage[EEPROMStore::PSTORE_SIZE];
 
 // Initialize the EEPROM object for ESP boards, setting aside storage
 void EEPROMStore::initialize()

@@ -240,4 +240,7 @@ class EEPROMStore
     static uint8_t read(uint8_t location);
     static void update(uint8_t location, uint8_t value);
     static void commit();
+
+public:
+    constexpr static uint8_t PSTORE_SIZE = STORE_SIZE;
 };

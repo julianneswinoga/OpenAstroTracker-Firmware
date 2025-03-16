@@ -284,7 +284,7 @@ int freeMemory()
 {
     char top;
     #ifdef __arm__
-    return &top - reinterpret_cast<char *>(sbrk(0));
+    return &top - sbrk(0);
     #elif defined(CORE_TEENSY) || (ARDUINO > 103 && ARDUINO != 151)
     return &top - __brkval;
     #else   // __arm__
@@ -334,7 +334,7 @@ String formatArg(const char *input, va_list args)
 
             case 'd':
                 {
-                    String s = String((int) va_arg(args, int));
+                    String s = String(va_arg(args, int));
                     strcpy(p, s.c_str());
                     p += s.length();
                 }
@@ -342,7 +342,7 @@ String formatArg(const char *input, va_list args)
 
             case 'x':
                 {
-                    int n             = (int) va_arg(args, int);
+                    int n             = va_arg(args, int);
                     int shift         = 12;
                     unsigned int mask = 0xF000;
                     *p++              = '0';
@@ -361,7 +361,7 @@ String formatArg(const char *input, va_list args)
 
             case 'l':
                 {
-                    String s = String((long) va_arg(args, long));
+                    String s = String(va_arg(args, long));
                     strcpy(p, s.c_str());
                     p += s.length();
                 }

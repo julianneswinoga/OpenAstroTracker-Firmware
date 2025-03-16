@@ -17,7 +17,7 @@
 #endif
 
 // Platform
-#if defined(ESP32) || defined(__AVR_ATmega2560__)
+#if defined(ESP32) || defined(__AVR_ATmega2560__) || defined(ARDUINO_ARCH_RP2040)
 // Valid platform
 #else
     #error Unsupported platform configuration. Use at own risk.
@@ -30,6 +30,9 @@
     && ((DISPLAY_TYPE == DISPLAY_TYPE_NONE) || (DISPLAY_TYPE == DISPLAY_TYPE_LCD_KEYPAD) || (DISPLAY_TYPE_LCD_KEYPAD_I2C_MCP23008)         \
         || (DISPLAY_TYPE_LCD_KEYPAD_I2C_MCP23017))
 // Valid display for ATmega
+#elif defined(ARDUINO_ARCH_RP2040)                                                                                                          \
+&& ((DISPLAY_TYPE == DISPLAY_TYPE_NONE))
+// No displays for pico
 #else
     #error Unsupported display configuration. Use at own risk.
 #endif

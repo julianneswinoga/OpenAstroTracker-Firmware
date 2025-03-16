@@ -99,6 +99,8 @@ void stepperControlTimerCallback(void *payload)
 // Main program setup
 //
 /////////////////////////////////
+Adafruit_USBD_CDC USBSer1;
+
 void setup()
 {
 #if defined(OAT_DEBUG_BUILD)
@@ -110,8 +112,20 @@ void setup()
     #endif
 #else
     Serial.begin(SERIAL_BAUDRATE);
+    delay(1500);
     #if DEBUG_LEVEL > 0 && DEBUG_SEPARATE_SERIAL == 1
     DEBUG_SERIAL_PORT.begin(DEBUG_SERIAL_BAUDRATE);
+    if (TinyUSBDevice.mounted()) {
+        TinyUSBDevice.detach();
+        delay(10);
+        TinyUSBDevice.attach();
+    }
+    while (!Serial) {
+        if (DEBUG_SERIAL_PORT) {
+            DEBUG_SERIAL_PORT.println("Waiting for other USB ports");
+        }
+        delay(1000);
+    }
     #endif
 #endif
 
@@ -494,6 +508,7 @@ void setup()
                             &StepperTask,        // The location that receives the thread id
                             0);                  // The core to run this on
 
+    #elif BOARD==BOARD_SKR_PICO
 #else
     #ifndef NEW_STEPPER_LIB
     // 2 kHz updates (higher frequency interferes with serial communications and complete messes up OATControl communications)

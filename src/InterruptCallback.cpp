@@ -11,6 +11,8 @@
 
     #if defined ESP32
     // We don't support ESP32 boards in interrupt mode
+    #elif BOARD == BOARD_SKR_PICO
+    // We don't support ESP32 boards in interrupt mode
     #elif defined __AVR_ATmega2560__  // Arduino Mega
         #define USE_TIMER_1 true
         #define USE_TIMER_2 true
